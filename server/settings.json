@@ -1,0 +1,17 @@
+{
+  "download-dir": "/home/__USER__/onepace",
+  "incomplete-dir": "/home/__USER__/onepace/.incomplete",
+  "incomplete-dir-enabled": true,
+  "download-queue-enabled": true,
+  "download-queue-size": 3,
+  "ratio-limit": 0,
+  "ratio-limit-enabled": true,
+  "rpc-enabled": true,
+  "rpc-bind-address": "127.0.0.1",
+  "rpc-whitelist": "127.0.0.1",
+  "rpc-whitelist-enabled": true,
+  "rpc-authentication-required": false,
+  "peer-port": 51413,
+  "encryption": 2,
+  "umask": 18
+}

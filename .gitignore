@@ -1,0 +1,22 @@
+# --- Content (do NOT distribute) ---
+# Magnet links / release catalogs and the personal episode ledger are excluded.
+# Build your own from One Pace releases you acquire yourself. See *.example.csv.
+data/dressrosaplus.csv
+data/releases.csv
+episodes.json
+episodes.fresh.json
+
+# --- Personal artifacts ---
+plan.md
+first-idea.jpeg
+tailscale-configs.png
+
+# --- Python / build cruft ---
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# --- Go build output ---
+server/watchtui/watchtui
