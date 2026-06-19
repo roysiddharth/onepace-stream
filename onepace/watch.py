@@ -57,7 +57,11 @@ def pick(lines, prompt="one pace> ", multi=False):
     args = ["fzf", "--delimiter", "\t", "--with-nth", "2..",
             "--prompt", prompt, "--height", "90%", "--reverse"]
     if multi:
-        args.append("--multi")
+        args += [
+            "--multi",
+            "--bind", "space:toggle+down",
+            "--header", "SPACE/TAB: select  •  ENTER: confirm  •  ESC: cancel",
+        ]
     proc = subprocess.run(
         args, input="\n".join(lines), capture_output=True, text=True,
     )
