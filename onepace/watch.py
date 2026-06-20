@@ -4,17 +4,20 @@ Usage: python3 -m onepace.watch
 Env:   ONEPACE_ROOT        (mount root, default /Volumes/onepace)
        ONEPACE_LEDGER      (path to episodes.json, default ./episodes.json)
        ONEPACE_SAMBA_USER  (Samba username on the server; required to mount)
+       ONEPACE_SAMBA_PASS  (Samba password on the server; required to mount)
        ONEPACE_HOST        (server's tailnet IP/hostname; required to mount)
 """
 import os
 import subprocess
 import sys
+from urllib.parse import quote
 
 from onepace import ledger
 
 ROOT = os.environ.get("ONEPACE_ROOT", "/Volumes/onepace")
 LEDGER = os.environ.get("ONEPACE_LEDGER", "episodes.json")
 SAMBA_USER = os.environ.get("ONEPACE_SAMBA_USER", "")
+SAMBA_PASS = os.environ.get("ONEPACE_SAMBA_PASS", "")
 SAMBA_HOST = os.environ.get("ONEPACE_HOST", "")  # server's tailnet IP/hostname
 
 
@@ -23,15 +26,19 @@ def mount(_args=None):
     if os.path.ismount(ROOT):
         print(f"already mounted: {ROOT}")
         return 0
-    if not SAMBA_USER or not SAMBA_HOST:
-        print("set ONEPACE_SAMBA_USER and ONEPACE_HOST (the server's tailnet "
-              "user/IP) before mounting.")
+    if not SAMBA_USER or not SAMBA_PASS or not SAMBA_HOST:
+        print("set ONEPACE_SAMBA_USER, ONEPACE_SAMBA_PASS, and ONEPACE_HOST "
+              "(the server's tailnet user/password/IP) before mounting.")
         return 1
     # ponytail: /Volumes is root-owned, so mkdir + chown need sudo; mount_smbfs
     # then runs as us onto a dir we own (root-owned dir => "Operation not permitted").
-    subprocess.run(["sudo", "mkdir", "-p", ROOT], check=True)
-    subprocess.run(["sudo", "chown", os.getlogin(), ROOT], check=True)
-    rc = subprocess.run(["mount_smbfs", f"//{SAMBA_USER}@{SAMBA_HOST}/onepace", ROOT]).returncode
+    sudo_prompt = ["-p", "your Mac login password (for sudo): "]
+    subprocess.run(["sudo", *sudo_prompt, "mkdir", "-p", ROOT], check=True)
+    subprocess.run(["sudo", *sudo_prompt, "chown", os.getlogin(), ROOT], check=True)
+    # Password embedded in the URL so mount_smbfs never prompts or touches Keychain.
+    user = quote(SAMBA_USER, safe="")
+    password = quote(SAMBA_PASS, safe="")
+    rc = subprocess.run(["mount_smbfs", f"//{user}:{password}@{SAMBA_HOST}/onepace", ROOT]).returncode
     if rc == 0:
         print(f"mounted: {ROOT}")
     return rc
